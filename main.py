@@ -55,11 +55,43 @@ class BACKGROUND:
         SCREEN.blit(self.bg, (self.bg_X, self.bg_Y))
         SCREEN.blit(self.ground, (self.ground_X, self.ground_Y))
 
+# Creating the Class for the Player
+class PLAYER:
+    def __init__(self):
+        self.player = pygame.image.load(GAME_SPRITES["player_walk_1"]).convert_alpha()
+        self.player_X  = 100
+        self.player_Y = 260
+        self.player_Y_move = 0
+        self.gravity = 0.8
+        self.jump = -15
+        
+        self.player_rect = self.player.get_rect(center = (self.player_X, self.player_Y))
+    
+    # Creating the Function to Draw the Player
+    def draw_player(self):
+        # global self.player
+        # global self.player_Y_move
+        # global self.gravity
+        SCREEN.blit(self.player, self.player_rect)
+    
+        # Adding Gravity to the Player
+        self.player_Y_move += self.gravity
+        self.player_rect.centery += self.player_Y_move
+    
+        # Creating the Boundary for the Player
+        if self.player_rect.centery >= 260:
+            self.player_rect.centery = 260
+            self.player = pygame.image.load(GAME_SPRITES["player_walk_1"]).convert_alpha()
         
 # Creating the Class for the Main logic of the Game
 class MAIN:
     def __init__(self):
         self.background = BACKGROUND()
+        self.the_player = PLAYER()
+
+    # Creating the Function to Draw all the Sprites at once
+    def draw_all_sprites(self):
+        self.the_player.draw_player()
 
 
 # Assigning the Classes
@@ -72,9 +104,22 @@ while RUNNING:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             RUNNING = False
+        # Creating the Game Keys
+        elif event.type == pygame.KEYDOWN:
+            # Creating the Player Jumping Keys
+            if event.key == pygame.K_SPACE and main_game.the_player.player_rect.centery >= 260:
+                jump_sound = pygame.mixer.Sound(GAME_AUDIO["jump"])
+                jump_sound.play()
+                main_game.the_player.player = pygame.image.load(GAME_SPRITES["jump"]).convert_alpha()
+                main_game.the_player.player_Y_move = 0
+                main_game.the_player.player_Y_move += main_game.the_player.jump
+
 
     # Adding the Background Image
     main_game.background.draw_background()
+
+    # Calling the Functions to Draw the Spites
+    main_game.draw_all_sprites()
 
     # Updating the Display Continiously
     pygame.display.update()
