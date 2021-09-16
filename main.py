@@ -139,24 +139,65 @@ class SNAIL:
         self.snail_rect = self.new_snail.get_rect(center = (self.snail_X, self.snail_Y))
 
         return self.new_snail, self.snail_rect
+
+# Creating the Class for the Fly
+class FLY:
+    def __init__(self):
+        # Creating the Required Variables for the Fly
+        self.fly = pygame.image.load(GAME_SPRITES["fly1"]).convert_alpha()
+        self.fly_X = 2250
+        self.fly_Y = 182
+        self.fly_X_move = -7
+
+        # Variables needed for the Animation
+        self.fly1 = pygame.image.load(GAME_SPRITES["fly1"]).convert_alpha()
+        self.fly2 = pygame.image.load(GAME_SPRITES["fly2"]).convert_alpha()
+
+        self.fly_animation_frames = [
+            self.fly1,
+            self.fly2
+        ]
         
+        self.frame_index = 1
+        
+    # Creating the Function to Draw the Fly
+    def draw_fly(self):
+        self.fly_rect = self.fly.get_rect(center = (self.fly_X, self.fly_Y))
+        SCREEN.blit(self.fly, self.fly_rect)
+
+        # Moving the Snail
+        self.fly_X += self.fly_X_move
+
+        # Creating the Boundary of Re-position for the Snail
+        if self.fly_X <= -1450:
+            self.fly_X = 2250
+            
+    # Creating the Function to Add the Fly Animation
+    def add_fly_animation(self):
+        self.new_fly = self.fly_animation_frames[self.frame_index]
+        self.fly_rect = self.new_fly.get_rect(center = (self.fly_X, self.fly_Y))
+
+        return self.new_fly, self.fly_rect
+
 # Creating the Class for the Main logic of the Game
 class MAIN:
     def __init__(self):
         self.background = BACKGROUND()
         self.the_player = PLAYER()
         self.the_snail = SNAIL()
+        self.the_fly = FLY()
 
     # Creating the Function to Draw all the Sprites at once
     def draw_all_sprites(self):
         self.the_player.draw_player()
         self.the_snail.draw_snail()
+        self.the_fly.draw_fly()
         self.check_collision()
         
     # Creating the Function to Check for Collision
     def check_collision(self):
         global RUNNING
-        if self.the_player.player_rect.colliderect(self.the_snail.snail_rect):
+        if self.the_player.player_rect.colliderect(self.the_snail.snail_rect) or self.the_player.player_rect.colliderect(self.the_fly.fly_rect):
             RUNNING = False
 
 
@@ -173,7 +214,9 @@ pygame.time.set_timer(PLAYER_ANIMATION, 150)
 SNAIL_ANIMATION = pygame.USEREVENT + 1
 pygame.time.set_timer(SNAIL_ANIMATION, 150)
 
-
+## Fly Animation
+FLY_ANIMATION = pygame.USEREVENT + 2
+pygame.time.set_timer(FLY_ANIMATION, 150)
 
 
 
@@ -201,7 +244,7 @@ while RUNNING:
 
             (main_game.the_player.player), (main_game.the_player.player_rect) = main_game.the_player.add_player_animation()
             
-        # Using the Player Animation Event to Animate the Player
+        # Using the Snail Animation Event to Animate the Snail
         elif event.type == SNAIL_ANIMATION:
             if main_game.the_snail.frame_index < 1:
                 main_game.the_snail.frame_index += 1
@@ -209,8 +252,16 @@ while RUNNING:
                 main_game.the_snail.frame_index = 0
 
             (main_game.the_snail.snail), (main_game.the_snail.snail_rect) = main_game.the_snail.add_snail_animation()
+            
+        # Using the Fly Animation Event to Animate the Fly
+        elif event.type == FLY_ANIMATION:
+            if main_game.the_fly.frame_index < 1:
+                main_game.the_fly.frame_index += 1
+            else:
+                main_game.the_fly.frame_index = 0
 
-
+            (main_game.the_fly.fly), (main_game.the_fly.fly_rect) = main_game.the_fly.add_fly_animation()
+        
 
     # Adding the Background Image
     main_game.background.draw_background()
