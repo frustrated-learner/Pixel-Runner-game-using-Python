@@ -14,6 +14,9 @@ ICON = pygame.image.load("graphics/icon/icon.png").convert_alpha()
 pygame.display.set_icon(ICON)
 pygame.display.set_caption("Pixel Runner")
 
+# Creating some Game Variables
+GAME_OVER = True
+
 # Adding the Game Sprites Using a Dictionary
 GAME_SPRITES = {
     "fly1" : "graphics/fly/fly1.png",
@@ -97,16 +100,45 @@ class PLAYER:
         self.player_rect = self.new_player.get_rect(center = (float(self.player_rect.centerx), float(self.player_rect.centery)))
 
         return self.new_player, self.player_rect
+
+# Creating the Class for the Snail 
+class SNAIL:
+    def __init__(self):
+        self.snail = pygame.image.load(GAME_SPRITES["snail1"]).convert_alpha()
+        self.snail_X = 850
+        self.snail_Y = 280
+        self.snail_X_move = -7
+
+    # Creating the Function to Draw the Snail
+    def draw_snail(self):
+        self.snail_rect = self.snail.get_rect(center = (self.snail_X, self.snail_Y))
+        SCREEN.blit(self.snail, self.snail_rect)
+
+        # Moving the Snail
+        self.snail_X += self.snail_X_move
+
+        # Creating the Boundary of Re-position for the Snail
+        if self.snail_X <= -50:
+            self.snail_X = 850
         
 # Creating the Class for the Main logic of the Game
 class MAIN:
     def __init__(self):
         self.background = BACKGROUND()
         self.the_player = PLAYER()
+        self.the_snail = SNAIL()
 
     # Creating the Function to Draw all the Sprites at once
     def draw_all_sprites(self):
         self.the_player.draw_player()
+        self.the_snail.draw_snail()
+        self.check_collision()
+        
+    # Creating the Function to Check for Collision
+    def check_collision(self):
+        global RUNNING
+        if self.the_player.player_rect.colliderect(self.the_snail.snail_rect):
+            RUNNING = False
 
 
 # Assigning the Classes
