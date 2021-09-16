@@ -8,7 +8,7 @@ pygame.init()
 RUNNING = True
 CLOCK = pygame.time.Clock()
 WIDTH = 800
-HEIGHT = 300
+HEIGHT = 400
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 ICON = pygame.image.load("graphics/icon/icon.png").convert_alpha()
 pygame.display.set_icon(ICON)
@@ -48,7 +48,7 @@ class BACKGROUND:
         # Creating some Ground Variables
         self.ground = pygame.image.load(GAME_SPRITES["ground"]).convert_alpha()
         self.ground_X = 0
-        self.ground_Y = 230
+        self.ground_Y = 300
 
     # Creating the Function to Add the Background Image on the Screen
     def draw_background(self):
