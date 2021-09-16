@@ -58,20 +58,28 @@ class BACKGROUND:
 # Creating the Class for the Player
 class PLAYER:
     def __init__(self):
+        # Creating some Required Variables for the Player
         self.player = pygame.image.load(GAME_SPRITES["player_walk_1"]).convert_alpha()
         self.player_X  = 100
         self.player_Y = 260
         self.player_Y_move = 0
         self.gravity = 0.8
         self.jump = -15
-        
         self.player_rect = self.player.get_rect(center = (self.player_X, self.player_Y))
+
+        # Creating some Player Animation Variables
+        self.player_walk_1 = pygame.image.load(GAME_SPRITES["player_walk_1"]).convert_alpha()
+        self.player_walk_2 = pygame.image.load(GAME_SPRITES["player_walk_2"]).convert_alpha()
+
+        self.player_animation_frames = [
+            self.player_walk_1,
+            self.player_walk_2
+        ]
+        
+        self.frame_index = 1
     
     # Creating the Function to Draw the Player
     def draw_player(self):
-        # global self.player
-        # global self.player_Y_move
-        # global self.gravity
         SCREEN.blit(self.player, self.player_rect)
     
         # Adding Gravity to the Player
@@ -79,9 +87,16 @@ class PLAYER:
         self.player_rect.centery += self.player_Y_move
     
         # Creating the Boundary for the Player
-        if self.player_rect.centery >= 260:
-            self.player_rect.centery = 260
+        if self.player_rect.centery >= self.player_Y:
+            self.player_rect.centery = self.player_Y
             self.player = pygame.image.load(GAME_SPRITES["player_walk_1"]).convert_alpha()
+
+    # Creating the Function to Add the Animation
+    def add_player_animation(self):
+        self.new_player = self.player_animation_frames[self.frame_index]
+        self.player_rect = self.new_player.get_rect(center = (float(self.player_rect.centerx), float(self.player_rect.centery)))
+
+        return self.new_player, self.player_rect
         
 # Creating the Class for the Main logic of the Game
 class MAIN:
@@ -96,6 +111,10 @@ class MAIN:
 
 # Assigning the Classes
 main_game = MAIN()
+
+# Creating the Userevents for the Animations
+PLAYER_ANIMATION = pygame.USEREVENT
+pygame.time.set_timer(PLAYER_ANIMATION, 150)
 
 
 
@@ -113,6 +132,16 @@ while RUNNING:
                 main_game.the_player.player = pygame.image.load(GAME_SPRITES["jump"]).convert_alpha()
                 main_game.the_player.player_Y_move = 0
                 main_game.the_player.player_Y_move += main_game.the_player.jump
+                
+        # Using the Player Animation Event to Animate the Player
+        elif event.type == PLAYER_ANIMATION and (main_game.the_player.player_rect.centery >= main_game.the_player.player_Y):
+            if main_game.the_player.frame_index < 1:
+                main_game.the_player.frame_index += 1
+            else:
+                main_game.the_player.frame_index = 0
+
+            (main_game.the_player.player), (main_game.the_player.player_rect) = main_game.the_player.add_player_animation()
+
 
 
     # Adding the Background Image
