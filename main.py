@@ -104,10 +104,22 @@ class PLAYER:
 # Creating the Class for the Snail 
 class SNAIL:
     def __init__(self):
+        # Some Required Variables for the Snail
         self.snail = pygame.image.load(GAME_SPRITES["snail1"]).convert_alpha()
         self.snail_X = 850
-        self.snail_Y = 280
+        self.snail_Y = 282
         self.snail_X_move = -7
+
+        # Variables needed for the Animation
+        self.snail1 = pygame.image.load(GAME_SPRITES["snail1"]).convert_alpha()
+        self.snail2 = pygame.image.load(GAME_SPRITES["snail2"]).convert_alpha()
+
+        self.snail_animation_frames = [
+            self.snail1,
+            self.snail2
+        ]
+        
+        self.frame_index = 1
 
     # Creating the Function to Draw the Snail
     def draw_snail(self):
@@ -120,6 +132,13 @@ class SNAIL:
         # Creating the Boundary of Re-position for the Snail
         if self.snail_X <= -50:
             self.snail_X = 850
+            
+    # Creating the Function to Add the Animation for the Snail
+    def add_snail_animation(self):
+        self.new_snail = self.snail_animation_frames[self.frame_index]
+        self.snail_rect = self.new_snail.get_rect(center = (self.snail_X, self.snail_Y))
+
+        return self.new_snail, self.snail_rect
         
 # Creating the Class for the Main logic of the Game
 class MAIN:
@@ -145,8 +164,16 @@ class MAIN:
 main_game = MAIN()
 
 # Creating the Userevents for the Animations
+
+## Player Animation
 PLAYER_ANIMATION = pygame.USEREVENT
 pygame.time.set_timer(PLAYER_ANIMATION, 150)
+
+## Snail Animation 
+SNAIL_ANIMATION = pygame.USEREVENT + 1
+pygame.time.set_timer(SNAIL_ANIMATION, 150)
+
+
 
 
 
@@ -173,6 +200,15 @@ while RUNNING:
                 main_game.the_player.frame_index = 0
 
             (main_game.the_player.player), (main_game.the_player.player_rect) = main_game.the_player.add_player_animation()
+            
+        # Using the Player Animation Event to Animate the Player
+        elif event.type == SNAIL_ANIMATION:
+            if main_game.the_snail.frame_index < 1:
+                main_game.the_snail.frame_index += 1
+            else:
+                main_game.the_snail.frame_index = 0
+
+            (main_game.the_snail.snail), (main_game.the_snail.snail_rect) = main_game.the_snail.add_snail_animation()
 
 
 
