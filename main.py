@@ -151,7 +151,7 @@ class FLY:
     def __init__(self):
         # Creating the Required Variables for the Fly
         self.fly = pygame.image.load(GAME_SPRITES["fly1"]).convert_alpha()
-        self.fly_X = 2250
+        self.fly_X = 850 + 500
         self.fly_Y = 182
         self.fly_X_move = -7
 
@@ -175,8 +175,8 @@ class FLY:
         self.fly_X += self.fly_X_move
 
         # Creating the Boundary of Re-position for the Snail
-        if self.fly_X <= -1450:
-            self.fly_X = 2250
+        if self.fly_X <= -50*2:
+            self.fly_X = 850*2
             
     # Creating the Function to Add the Fly Animation
     def add_fly_animation(self):
@@ -242,18 +242,19 @@ class MAIN:
             
     # Creating the Function to Update the Score
     def update_score(self):
-        if (self.the_snail.snail_X <= 95 and self.the_snail.snail_X >= 94) or (self.the_fly.fly_X <= 95 and self.the_fly.fly_X >= 94):
+        if (int(self.the_snail.snail_X) <= 95 and int(self.the_snail.snail_X) >= 94):
             self.the_score.score_value += 1
 
     #  Creating the Function to Add the Game over Screen
     def game_over_screen(self):
         SCREEN.fill(STEELBLUE)
         self.the_score.game_over_score()
+        
+# Adding the Background Music
+mixer.music.load(GAME_AUDIO["music"])
+mixer.music.play(-1)
 
         
-            
-
-
 # Assigning the Classes
 main_game = MAIN()
 
