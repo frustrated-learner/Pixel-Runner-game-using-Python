@@ -39,6 +39,9 @@ GAME_AUDIO = {
     "music" : "audio/music.wav"
 }
 
+# Colors
+BLACK = (0, 0, 0)
+
 # Creating a Class for the Game Background
 class BACKGROUND:
     def __init__(self):
@@ -133,6 +136,7 @@ class SNAIL:
         if self.snail_X <= -50:
             self.snail_X = 850
             
+            
     # Creating the Function to Add the Animation for the Snail
     def add_snail_animation(self):
         self.new_snail = self.snail_animation_frames[self.frame_index]
@@ -179,6 +183,19 @@ class FLY:
 
         return self.new_fly, self.fly_rect
 
+# Creating the Class for the Score
+class SCORE:
+    def __init__(self):
+        self.font = pygame.font.Font("font/font.ttf", 50)
+        self.score_value = 0
+
+    # Creating the Function to Draw the Score
+    def draw_score(self):
+        self.score_surface = self.font.render(f"Score : {self.score_value}", True, BLACK)
+        self.score_rect = self.score_surface.get_rect(center = (380, 50))
+        SCREEN.blit(self.score_surface, self.score_rect)
+
+
 # Creating the Class for the Main logic of the Game
 class MAIN:
     def __init__(self):
@@ -186,6 +203,7 @@ class MAIN:
         self.the_player = PLAYER()
         self.the_snail = SNAIL()
         self.the_fly = FLY()
+        self.the_score = SCORE()
 
     # Creating the Function to Draw all the Sprites at once
     def draw_all_sprites(self):
@@ -193,12 +211,20 @@ class MAIN:
         self.the_snail.draw_snail()
         self.the_fly.draw_fly()
         self.check_collision()
+        self.the_score.draw_score()
+        self.update_score()
         
     # Creating the Function to Check for Collision
     def check_collision(self):
         global RUNNING
         if self.the_player.player_rect.colliderect(self.the_snail.snail_rect) or self.the_player.player_rect.colliderect(self.the_fly.fly_rect):
             RUNNING = False
+            
+    # Creating the Function to Update the Score
+    def update_score(self):
+        if (self.the_snail.snail_X <= 95 and self.the_snail.snail_X >= 94) or (self.the_fly.fly_X <= 95 and self.the_fly.fly_X >= 94):
+            self.the_score.score_value += 1
+            
 
 
 # Assigning the Classes
