@@ -15,7 +15,7 @@ pygame.display.set_icon(ICON)
 pygame.display.set_caption("Pixel Runner")
 
 # Creating some Game Variables
-GAME_OVER = True
+GAME_OVER = False
 
 # Adding the Game Sprites Using a Dictionary
 GAME_SPRITES = {
@@ -41,6 +41,8 @@ GAME_AUDIO = {
 
 # Colors
 BLACK = (0, 0, 0)
+STEELBLUE = (70, 130, 180)
+WHITE = (255, 255, 255)
 
 # Creating a Class for the Game Background
 class BACKGROUND:
@@ -186,14 +188,32 @@ class FLY:
 # Creating the Class for the Score
 class SCORE:
     def __init__(self):
-        self.font = pygame.font.Font("font/font.ttf", 50)
         self.score_value = 0
 
     # Creating the Function to Draw the Score
     def draw_score(self):
+        self.font = pygame.font.Font("font/font.ttf", 50)
         self.score_surface = self.font.render(f"Score : {self.score_value}", True, BLACK)
         self.score_rect = self.score_surface.get_rect(center = (380, 50))
         SCREEN.blit(self.score_surface, self.score_rect)
+        
+    # Creating the Function to Draw the Score After the Game over
+    def game_over_score(self):
+        self.font = pygame.font.Font("font/font.ttf", 80)
+        self.score_surface = self.font.render(f"GAME OVER !", True, WHITE)
+        self.score_rect = self.score_surface.get_rect(center = (380, 50))
+        SCREEN.blit(self.score_surface, self.score_rect)
+        
+        self.font = pygame.font.Font("font/font.ttf", 60)
+        self.score_surface_2 = self.font.render(f"You Scored : {self.score_value}", True, BLACK)
+        self.score_rect_2 = self.score_surface.get_rect(center = (380, 100))
+        SCREEN.blit(self.score_surface_2, self.score_rect_2)
+        
+        # Adding the Pixel Runner on the Game over screen
+        self.player = pygame.image.load(GAME_SPRITES["player_stand"]).convert_alpha()
+        self.player_tranform = pygame.transform.scale2x(self.player)
+        self.player_rect = self.player.get_rect(center = (340, 190))
+        SCREEN.blit(self.player_tranform, self.player_rect)
 
 
 # Creating the Class for the Main logic of the Game
@@ -216,14 +236,21 @@ class MAIN:
         
     # Creating the Function to Check for Collision
     def check_collision(self):
-        global RUNNING
+        global GAME_OVER
         if self.the_player.player_rect.colliderect(self.the_snail.snail_rect) or self.the_player.player_rect.colliderect(self.the_fly.fly_rect):
-            RUNNING = False
+            GAME_OVER = True
             
     # Creating the Function to Update the Score
     def update_score(self):
         if (self.the_snail.snail_X <= 95 and self.the_snail.snail_X >= 94) or (self.the_fly.fly_X <= 95 and self.the_fly.fly_X >= 94):
             self.the_score.score_value += 1
+
+    #  Creating the Function to Add the Game over Screen
+    def game_over_screen(self):
+        SCREEN.fill(STEELBLUE)
+        self.the_score.game_over_score()
+
+        
             
 
 
@@ -254,12 +281,19 @@ while RUNNING:
         # Creating the Game Keys
         elif event.type == pygame.KEYDOWN:
             # Creating the Player Jumping Keys
-            if event.key == pygame.K_SPACE and main_game.the_player.player_rect.centery >= 260:
+            if event.key == pygame.K_SPACE and main_game.the_player.player_rect.centery >= 260 and GAME_OVER == False:
                 jump_sound = pygame.mixer.Sound(GAME_AUDIO["jump"])
                 jump_sound.play()
                 main_game.the_player.player = pygame.image.load(GAME_SPRITES["jump"]).convert_alpha()
                 main_game.the_player.player_Y_move = 0
                 main_game.the_player.player_Y_move += main_game.the_player.jump
+                
+            # Creating the Game Restarting Key
+            if event.key == pygame.K_SPACE and GAME_OVER == True:
+                GAME_OVER = False
+                main_game.the_snail.snail_X = 850
+                main_game.the_fly.fly_X = 2250
+                main_game.the_score.score_value = 0
                 
         # Using the Player Animation Event to Animate the Player
         elif event.type == PLAYER_ANIMATION and (main_game.the_player.player_rect.centery >= main_game.the_player.player_Y):
@@ -289,11 +323,16 @@ while RUNNING:
             (main_game.the_fly.fly), (main_game.the_fly.fly_rect) = main_game.the_fly.add_fly_animation()
         
 
-    # Adding the Background Image
-    main_game.background.draw_background()
+    # Creating the Condition to Check if the Game is Active or not
+    if GAME_OVER == False:
+        # Adding the Background Image
+        main_game.background.draw_background()
 
-    # Calling the Functions to Draw the Spites
-    main_game.draw_all_sprites()
+        # Calling the Functions to Draw the Spites
+        main_game.draw_all_sprites()
+    else:
+        # Adding the Game over Score
+        main_game.game_over_screen()
 
     # Updating the Display Continiously
     pygame.display.update()
